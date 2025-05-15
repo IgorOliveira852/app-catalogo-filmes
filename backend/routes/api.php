@@ -8,6 +8,7 @@ use App\Http\Controllers\Movies\FavoriteMovieController;
 use App\Http\Controllers\Movies\MovieController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('ping', fn() => response()->json(['message' => 'pong']));
 
 Route::post('/register', RegisterController::class);
 Route::post('/login', AuthController::class);
