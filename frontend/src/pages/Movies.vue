@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <RouterView />
+  Meus filmes
 </template>
 
 <style scoped>
