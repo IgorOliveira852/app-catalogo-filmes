@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('ping', fn() => response()->json(['message' => 'pong']));
 
-Route::post('/register', RegisterController::class);
-Route::post('/login', AuthController::class);
+Route::post('/register', RegisterController::class)->name('register');
+Route::post('/login', AuthController::class)->name('auth');
 
 Route::middleware('auth:sanctum')->group(fn() => [
     Route::get('/user', fn(\Illuminate\Http\Request $request) => response()->json($request->user())),
