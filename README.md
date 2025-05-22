@@ -27,8 +27,8 @@ Este projeto é uma API em Laravel configurada para rodar dentro de containers D
 ### 1. Clonar o repositório
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/IgorOliveira852/app-catalogo-filmes.git
+cd app-catalogo-filmes
 ```
 
 ### 2. Copiar o .env
@@ -49,6 +49,7 @@ DB_PASSWORD=root
 
 ### 3. Subir os containers
 
+1. Entre na pasta backend e rode o comando:
 ```bash
 docker compose up --build -d
 ```
@@ -66,7 +67,7 @@ Esse comando irá:
 ### Acessar o container da aplicação:
 
 ```bash
-docker compose exec app bash
+docker exec -it backend bash
 ```
 
 Dentro do bash do container, você pode rodar comandos Artisan, Composer ou qualquer outro comando PHP.
