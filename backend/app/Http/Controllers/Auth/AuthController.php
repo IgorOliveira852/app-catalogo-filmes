@@ -22,7 +22,7 @@ class AuthController extends Controller
         $user = User::query()->where('email', $request->email)->firstOrFail();
 
         return response()->json([
-            'message' => 'Invalid credentials',
+            'message' => 'Login realizado com sucesso.',
             'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => $user,
         ], 401);
