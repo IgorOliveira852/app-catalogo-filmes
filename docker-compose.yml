@@ -14,6 +14,18 @@ services:
       - ./backend:/var/www
     depends_on:
       - mysql
+    # Sobrescreve o comando padrão
+    command: >
+      sh -c "
+        # espera o MySQL subir (simples polling)
+        until nc -z mysql 3306; do
+          echo 'Aguardando banco de dados...'
+          sleep 2
+        done &&
+        cd /var/www &&
+        php artisan migrate --force &&
+        php-fpm
+      "
 
   mysql:
     image: mysql:8.0
