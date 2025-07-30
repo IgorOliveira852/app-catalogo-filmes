@@ -1,54 +1,68 @@
-import {createRouter, createWebHistory} from "vue-router";
-import DefaultLayout from "./components/DefaultLayout.vue";
-import Home from "./pages/Home.vue";
-import MyImages from "./pages/MyImages.vue";
-import Login from "./pages/Login.vue";
-import Signup from "./pages/Signup.vue";
-import NotFound from "./pages/NotFound.vue";
-import Movies from "./pages/Movies.vue";
-import Favorites from "./pages/Favorites.vue";
-import useUserStore from "./store/user.js";
+// router.js
+import { createRouter, createWebHistory } from 'vue-router'
+import DefaultLayout  from './components/DefaultLayout.vue'
+import Home           from './pages/Home.vue'
+import Movies         from './pages/Movies.vue'
+import Favorites      from './pages/Favorites.vue'
+import Login          from './pages/Login.vue'
+import Signup         from './pages/Signup.vue'
+import NotFound       from './pages/NotFound.vue'
+import {useUserStore} from './store/user.js'
 
 const routes = [
     {
-        path: "/",
+        path: '/',
         component: DefaultLayout,
+        meta: { requiresAuth: true },
         children: [
-            {path: '/', name: 'Home', component: Home},
-            // {path: '/images', name: 'MyImages', component: MyImages},
-            {path: '/movies', name: 'Movies', component: Movies},
-            {path: '/favorites', name: 'Favorites', component: Favorites},
-        ],
-        beforeEnter: async (to, from, next) => {
-            try {
-                const userStore = useUserStore();
-                await userStore.fetchUser();
-                next();
-            } catch (error) {
-                next(false); // cancela a navegação se a busca de dados falhar
-            }
-        },
+            { path: '',           name: 'Home',      component: Home },
+            { path: 'movies',     name: 'Movies',    component: Movies },
+            { path: 'favorites',  name: 'Favorites', component: Favorites },
+        ]
     },
+
     {
         path: '/login',
         name: 'Login',
         component: Login,
+        meta: { isGuest: true }
     },
     {
         path: '/signup',
         name: 'Signup',
         component: Signup,
+        meta: { isGuest: true }
     },
-    {
-        path: '/:pathMatch(.*)*',
-        name: 'not-found',
-        component: NotFound,
-    }
-];
+
+    { path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound }
+]
 
 const router = createRouter({
     history: createWebHistory(),
     routes
 })
 
-export default router;
+// guard global
+router.beforeEach(async (to, from, next) => {
+    const userStore = useUserStore()
+
+    if (!userStore.user && localStorage.getItem('AUTH_TOKEN')) {
+        try {
+            await userStore.fetchUser()
+        } catch (err) {
+            userStore.logout()
+        }
+    }
+
+    if (to.meta.requiresAuth && !userStore.user) {
+        return next({ name: 'Login' })
+    }
+
+    if (to.meta.isGuest && userStore.user) {
+        return next({ name: 'Home' })
+    }
+
+    next()
+})
+
+export default router

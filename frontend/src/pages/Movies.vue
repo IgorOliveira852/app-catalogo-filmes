@@ -1,39 +1,93 @@
 <script setup>
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Navigation } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import { ref, onMounted, computed } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Navigation } from 'swiper/modules'
+import 'swiper/css'
+import 'swiper/css/navigation'
 
-const movies = [
-  { id: 1, title: 'Inception', poster: 'https://image.tmdb.org/t/p/w500/8tNX8s3j1O0eqilOQkuroRLyOZA.jpg' },
-  { id: 2, title: 'Interstellar', poster: 'https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg' },
-  { id: 3, title: 'The Batman', poster: 'https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg' },
-  { id: 4, title: 'Dune', poster: 'https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg' },
-  { id: 5, title: 'Avatar 2', poster: 'https://image.tmdb.org/t/p/w500/6oH378KUfCEitzJkm07r97L0RsZ.jpg' },
-];
+import axiosClient from '../axios.js'
+import MovieFilters from '../components/MovieFilters.vue'
+import MovieList from '../components/MovieList.vue'
+import { useFilterOptions } from '../composables/useFilterOptions.js'
+
+// 1. Estado de filtros
+const filters = ref({
+  query: '',
+  type: 'movie',
+  page: 1,
+  genre: '',
+  sort_by: 'popularity.desc',
+  release_date_gte: '',
+  release_date_lte: '',
+  vote_average_gte: ''
+})
+
+// 2. Estado de filmes
+const movies  = ref([])
+const loading = ref(false)
+const error   = ref('')
+
+// 3. Usando o composable para buscar “genres”
+const { options, init } = useFilterOptions()
+const genres = computed(() => options.value.genres || [])
+
+// 4. Função de busca
+async function fetchMovies() {
+  loading.value = true
+  error.value   = ''
+
+  try {
+    const { data } = await axiosClient.get('/movies/search', {
+      params: { ...filters.value, page: filters.value.page }
+    })
+    movies.value = data
+  } catch (err) {
+    error.value = err.response?.data?.message || 'Erro ao carregar filmes.'
+  } finally {
+    loading.value = false
+  }
+}
+
+// 5. No mount, inicializa “genres” e busca filmes
+onMounted(async () => {
+  await init(['genres'])
+  fetchMovies()
+})
 </script>
 
 <template>
-  <section class="px-6 py-8 bg-gray-100 min-h-screen relative">
+  <section class="px-6 py-8 bg-gray-100 min-h-screen">
     <h2 class="text-2xl font-bold mb-4 text-gray-800">Meus filmes</h2>
 
-    <Swiper
-        :slides-per-view="3"
-        :space-between="20"
-        :navigation="true"
-        :modules="[Navigation]"
-        class="relative w-full h-80 rounded-lg overflow-hidden"
-    >
-      <SwiperSlide v-for="movie in movies" :key="movie.id">
-        <div class="rounded-lg overflow-hidden shadow-xl bg-white">
-          <img :src="movie.poster" class="w-full h-60 object-cover" />
-          <div class="px-4 py-2">
-            <h3 class="text-center text-lg font-semibold text-gray-700">{{ movie.title }}</h3>
-          </div>
-        </div>
-      </SwiperSlide>
+    <!-- filtro -->
+    <MovieFilters
+        v-model="filters"
+        :genres="genres"
+        @search="fetchMovies"
+    />
 
-    </Swiper>
+    <!-- 1) Skeleton enquanto carrega -->
+    <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+      <div
+          v-for="n in 10"
+          :key="n"
+          class="animate-pulse space-y-2"
+      >
+        <div class="bg-gray-300 h-48 rounded-lg"></div>
+        <div class="h-4 bg-gray-300 rounded w-3/4"></div>
+        <div class="h-4 bg-gray-300 rounded w-1/2"></div>
+      </div>
+    </div>
+
+    <!-- 2) Mensagem de erro -->
+    <div v-else-if="error" class="text-red-600 text-center py-10">
+      {{ error }}
+    </div>
+
+    <!-- 3) Grid de filmes quando houver dados -->
+    <div v-else>
+      <MovieList :movies="movies" />
+    </div>
   </section>
 </template>
 
