@@ -1,6 +1,32 @@
 <script setup>
-
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axiosClient from '../axios.js';
 import GuestLayout from "../components/GuestLayout.vue";
+import { useToast } from 'vue-toastification';
+const toast = useToast();
+
+const email = ref('');
+const password = ref('');
+const errorMessage = ref('');
+const router = useRouter();
+
+const handleSubmit = async () => {
+  errorMessage.value = '';
+  try {
+    const { data } = await axiosClient.post('/login', {
+      email: email.value,
+      password: password.value,
+    });
+
+    localStorage.setItem('AUTH_TOKEN', data.token);
+
+    await router.push({name: 'Home'});
+  } catch (error) {
+    const message = error.response?.data?.message || 'Erro inesperado.';
+    toast.error(message);
+  }
+};
 </script>
 
 <template>
@@ -8,11 +34,18 @@ import GuestLayout from "../components/GuestLayout.vue";
     <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Sign in to your account</h2>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-      <form class="space-y-6" action="#" method="POST">
+      <form class="space-y-6" @submit.prevent="handleSubmit">
         <div>
           <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
           <div class="mt-2">
-            <input type="email" name="email" id="email" autocomplete="email" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+            <input
+                v-model="email"
+                type="email"
+                name="email"
+                id="email"
+                autocomplete="email"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
           </div>
         </div>
 
@@ -21,7 +54,14 @@ import GuestLayout from "../components/GuestLayout.vue";
             <label for="password" class="block text-sm/6 font-medium text-gray-900">Senha</label>
           </div>
           <div class="mt-2">
-            <input type="password" name="password" id="password" autocomplete="current-password" required="" class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+            <input
+                v-model="password"
+                type="password"
+                name="password"
+                id="password"
+                autocomplete="current-password"
+                required
+                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
           </div>
         </div>
 

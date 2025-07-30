@@ -22,7 +22,7 @@ function submit() {
   axiosClient.post('/register', data.value)
       .then(response => {
         console.log(response.data);
-        router.push({ name: 'Login' }); // Redireciona após o registro
+        router.push({ name: 'Login' });
       })
       .catch(error => {
         if (error.response && error.response.status === 422) {
@@ -31,83 +31,91 @@ function submit() {
       });
 }
 
-
 </script>
 
 <template>
   <GuestLayout>
-    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Create new Account</h2>
+    <h2 class="mt-10 text-center text-2xl font-bold text-gray-900">
+      Create new Account
+    </h2>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="submit" class="space-y-4">
+
+        <!-- Nome completo -->
         <div>
-          <label for="name" class="block text-sm/6 font-medium text-gray-900">Full Name</label>
-          <div class="mt-2">
-            <input name="name"
-                   id="name"
-                   v-model="data.name"
-                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-          </div>
-          <p class="text-sm mt-1 text-red-600">
-            {{ errors.name ? errors.name[0] : '' }}
-          </p>
-        </div>
-        <div>
-          <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
-          <div class="mt-2">
-            <input type="email"
-                   name="email"
-                   id="email"
-                   autocomplete="email"
-                   v-model="data.email"
-                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-          </div>
-          <p class="text-sm mt-1 text-red-600">
-            {{ errors.email ? errors.email[0] : '' }}
+          <label for="name" class="block text-sm font-medium text-gray-900">
+            Full Name
+          </label>
+          <input
+              id="name"
+              v-model="form.name"
+              class="block w-full rounded-md px-3 py-1.5 outline outline-1 outline-gray-300 focus:outline-indigo-600"
+          />
+          <p v-if="errors.name" class="mt-1 text-sm text-red-600">
+            {{ errors.name[0] }}
           </p>
         </div>
 
+        <!-- Email -->
         <div>
-          <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
-          </div>
-          <div class="mt-2">
-            <input type="password"
-                   name="password"
-                   id="password"
-                   v-model="data.password"
-                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-          </div>
-          <p class="text-sm mt-1 text-red-600">
-            {{ errors.password ? errors.password[0] : '' }}
+          <label for="email" class="block text-sm font-medium text-gray-900">
+            Email address
+          </label>
+          <input
+              id="email"
+              type="email"
+              v-model="form.email"
+              class="block w-full rounded-md px-3 py-1.5 outline outline-1 outline-gray-300 focus:outline-indigo-600"
+          />
+          <p v-if="errors.email" class="mt-1 text-sm text-red-600">
+            {{ errors.email[0] }}
           </p>
         </div>
 
+        <!-- Senha -->
         <div>
-          <div class="flex items-center justify-between">
-            <label for="passwordConfirmation" class="block text-sm/6 font-medium text-gray-900">Repeat Password</label>
-          </div>
-          <div class="mt-2">
-            <input type="password"
-                   name="password"
-                   id="passwordConfirmation"
-                   v-model="data.password_confirmation"
-                   class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
-          </div>
+          <label for="password" class="block text-sm font-medium text-gray-900">
+            Password
+          </label>
+          <input
+              id="password"
+              type="password"
+              v-model="form.password"
+              class="block w-full rounded-md px-3 py-1.5 outline outline-1 outline-gray-300 focus:outline-indigo-600"
+          />
+          <p v-if="errors.password" class="mt-1 text-sm text-red-600">
+            {{ errors.password[0] }}
+          </p>
+        </div>
+
+        <!-- Repetir senha -->
+        <div>
+          <label for="passwordConfirmation" class="block text-sm font-medium text-gray-900">
+            Repeat Password
+          </label>
+          <input
+              id="passwordConfirmation"
+              type="password"
+              v-model="form.password_confirmation"
+              class="block w-full rounded-md px-3 py-1.5 outline outline-1 outline-gray-300 focus:outline-indigo-600"
+          />
         </div>
 
         <div>
-          <button type="submit" class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          <button
+              type="submit"
+              class="w-full rounded-md bg-indigo-600 px-3 py-1.5 text-white hover:bg-indigo-500"
+          >
             Create an Account
           </button>
         </div>
       </form>
 
-      <p class="mt-10 text-center text-sm/6 text-gray-500">
+      <p class="mt-10 text-center text-sm text-gray-500">
         Already have an account?
-        {{ ' ' }}
-        <RouterLink :to="{name: 'Login'}" class="font-semibold text-indigo-600 hover:text-indigo-500">
-          Login from here
+        <RouterLink to="{ name: 'Login' }" class="font-semibold text-indigo-600 hover:text-indigo-500">
+          Login here
         </RouterLink>
       </p>
     </div>

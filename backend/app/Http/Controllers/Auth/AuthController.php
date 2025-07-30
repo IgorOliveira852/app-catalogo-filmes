@@ -25,6 +25,6 @@ class AuthController extends Controller
             'message' => 'Login realizado com sucesso.',
             'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => $user,
-        ], 401);
+        ], 200);
     }
 }
