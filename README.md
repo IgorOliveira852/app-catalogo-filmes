@@ -67,7 +67,7 @@ Esse comando irá:
 ### Acessar o container da aplicação:
 
 ```bash
-docker exec -it backend bash
+docker exec -it laravel-app bash
 ```
 
 Dentro do bash do container, você pode rodar comandos Artisan, Composer ou qualquer outro comando PHP.
