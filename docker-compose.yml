@@ -17,17 +17,20 @@ services:
     # Sobrescreve o comando padrão
     command: >
       sh -c "
+        # espera o MySQL subir (simples polling)
         until nc -z mysql 3306; do
           echo 'Aguardando banco de dados…'
           sleep 2
         done &&
         cd /var/www &&
         composer install &&
+        php artisan optimize &&
+        php artisan route:clear &&
         php artisan migrate --force &&
-        php artisan test --stop-on-failure &&   # <<-- Roda a suíte de testes
+        #php artisan db:seed --force &&
+        php artisan test --stop-on-failure &&
         php-fpm
       "
-  
 
   mysql:
     image: mysql:8.0
