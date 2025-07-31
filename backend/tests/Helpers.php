@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests;
+
 class Helpers
 {
     // Função para autenticar um usuário e retornar o token nos outros tests

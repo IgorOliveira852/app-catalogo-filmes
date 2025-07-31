@@ -16,7 +16,7 @@ Route::middleware('auth:sanctum')->group(fn() => [
     Route::get('/user', fn(\Illuminate\Http\Request $request) => response()->json($request->user())),
 
     Route::prefix('movies')->group(fn() => [
-        Route::get('search', [MovieController::class, 'search']),
+        Route::get('search', [MovieController::class, 'search'])->name('movies.search'),
         Route::get('details/{movieId}', [MovieController::class, 'details']),
         Route::get('filters/{slug}', GetFiltersController::class),
 

@@ -7,20 +7,47 @@ use Laravel\Sanctum\Sanctum;
 
 uses(RefreshDatabase::class);
 
-test('user try to login with an account already exist', function () {
-    $user = User::factory()->create(['password' => '123456']);
-    Sanctum::actingAs(
-        $user,
-        ['*']
-    );
-
-    /* @var TestResponse $response */
-    $response = $this->postJson(route('auth'), ['email' => $user->email, 'password' => '123456']);
-    $response->assertStatus(200);
+beforeEach(function () {
+    User::factory()->create([
+        'email'    => 'user@test.com',
+        'password' => bcrypt('12345678'),
+    ]);
 });
 
-test('user try to login with an account doesnt exist', function () {
-    /* @var TestResponse $response */
-    $response = $this->postJson(route('auth'), ['email' => 'user@test.com', 'password' => '123456']);
-    $response->assertStatus(422);
+test('authenticates with valid credentials', function () {
+    $response = $this->postJson(route('auth'), [
+        'email'    => 'user@test.com',
+        'password' => '12345678',
+    ]);
+
+    $response
+        ->assertStatus(200)
+        ->assertJsonStructure([
+            'message',
+            'token',
+            'user' => ['id', 'name', 'email'],
+        ]);
 });
+
+dataset('invalid logins', [
+    ['wrong@test.com', '12345678'],
+    ['user@test.com',   'badpassword'],
+]);
+
+test('fails with invalid credentials', function (string $email, string $password) {
+    $response = $this->postJson(route('auth'), [
+        'email'    => $email,
+        'password' => $password,
+    ]);
+
+    if ($email === 'user@test.com') {
+        $response
+            ->assertStatus(401)
+            ->assertJsonPath('message', 'Credenciais inválidas.');
+    } else {
+        $response
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['email'])
+            ->assertJsonPath('message', 'E-mail e/ou senha informados são inválido(s)!');
+    }
+})->with('invalid logins');
