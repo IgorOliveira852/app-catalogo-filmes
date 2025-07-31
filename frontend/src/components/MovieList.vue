@@ -53,7 +53,6 @@ export default {
   <Swiper
       :modules="[Navigation]"
       navigation
-      :pagination="{ clickable: true }"
       :breakpoints="breakpoints"
       class="my-6"
   >
@@ -70,7 +69,6 @@ export default {
             class="w-full h-auto block"
         />
 
-        <!-- Badge no canto inferior direito -->
         <div
             class="absolute bottom-2 right-2 w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold bg-black bg-opacity-70 text-white"
             :class="ratingClass(movie.vote_average)"
@@ -79,20 +77,22 @@ export default {
         </div>
       </div>
 
-      <div class="p-3 bg-white">
-        <h3 class="text-gray-900 font-semibold text-sm mb-1 truncate">
+      <div class="p-3 bg-white space-y-2">
+        <h3 class="text-gray-900 font-semibold text-sm truncate">
           {{ movie.title }}
         </h3>
-        <p class="text-gray-600 text-xs mb-2">
-          {{ formatDate(movie.release_date) }}
-        </p>
-        <p
-            class="text-gray-700 text-xs line-clamp-3"
-            v-if="movie.overview"
-            :title="movie.overview"
-        >
+        <p class="text-gray-600 text-xs">{{ formatDate(movie.release_date) }}</p>
+        <p class="text-gray-700 text-xs line-clamp-3" v-if="movie.overview">
           {{ movie.overview }}
         </p>
+
+        <!-- Botão de detalhes -->
+        <button
+            @click="$emit('show-details', movie.id)"
+            class="w-full text-center mt-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+        >
+          Detalhes
+        </button>
       </div>
     </SwiperSlide>
   </Swiper>

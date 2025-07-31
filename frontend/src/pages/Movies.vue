@@ -8,6 +8,7 @@ import 'swiper/css/navigation'
 import axiosClient from '../axios.js'
 import MovieFilters from '../components/MovieFilters.vue'
 import MovieList from '../components/MovieList.vue'
+import MovieDetailsModal from '../components/MovieDetailsModal.vue'
 import { useFilterOptions } from '../composables/useFilterOptions.js'
 
 // 1. Estado de filtros
@@ -30,6 +31,18 @@ const error   = ref('')
 // 3. Usando o composable para buscar “genres”
 const { options, init } = useFilterOptions()
 const genres = computed(() => options.value.genres || [])
+
+const showModal = ref(false)
+const selectedMovieId = ref(null)
+
+function openDetails(id) {
+  selectedMovieId.value = id
+  showModal.value = true
+}
+function closeModal() {
+  showModal.value = false
+  selectedMovieId.value = null
+}
 
 // 4. Função de busca
 async function fetchMovies() {
@@ -85,9 +98,18 @@ onMounted(async () => {
     </div>
 
     <!-- 3) Grid de filmes quando houver dados -->
-    <div v-else>
-      <MovieList :movies="movies" />
-    </div>
+    <MovieList
+        v-else
+        :movies="movies"
+        @show-details="openDetails"
+    />
+
+    <!-- Modal de detalhes -->
+    <MovieDetailsModal
+        v-if="showModal"
+        :movieId="selectedMovieId"
+        @close="closeModal"
+    />
   </section>
 </template>
 
