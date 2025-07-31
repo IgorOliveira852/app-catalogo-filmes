@@ -41,7 +41,7 @@ class GetFiltersController extends Controller
 
     private function getGenres(): JsonResponse
     {
-        $genres = collect($this->tmdbService->getGenres()['genres'])
+        $genres = collect($this->tmdbService->getGenres())
             ->map(fn($genre) => [
                 'value' => $genre['id'],
                 'label' => $genre['name'],

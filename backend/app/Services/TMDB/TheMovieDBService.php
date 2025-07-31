@@ -4,6 +4,7 @@ namespace App\Services\TMDB;
 
 use App\Services\TMDB\TheMovieDBInterface;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 
 class TheMovieDBService implements TheMovieDBInterface
@@ -48,16 +49,22 @@ class TheMovieDBService implements TheMovieDBInterface
 
     public function getGenres(): array
     {
-        return $this->makeRequest("genre/movie/list");
+        return Cache::remember('tmdb.genres', 60 * 24, fn() =>
+            $this->makeRequest('genre/movie/list')['genres']
+        );
     }
 
-    public function getMoviesList(string $endpoint): array
+    public function getMoviesList(string $endpoint, int $page = 1): array
     {
-        return $this->makeRequest($endpoint, [
-            'api_key' => $this->apiKey,
-            'language' => 'pt-BR',
-            'page' => 1
-        ]);
+        $cacheKey = "tmdb.{$endpoint}.page_{$page}";
+
+        return Cache::remember($cacheKey, now()->addMinutes(30), fn() =>
+            $this->makeRequest($endpoint, [
+                'api_key'  => $this->apiKey,
+                'language' => 'pt-BR',
+                'page'     => $page,
+            ])
+        );
     }
 
     /**

@@ -30,7 +30,7 @@ class FavoriteMovieController extends Controller
             'vote_average' => $request->vote_average,
         ]);
 
-        $genres = collect($this->tmdbService->getGenres()['genres']);
+        $genres = collect($this->tmdbService->getGenres());
 
         foreach ($request->genre_ids as $genreId) {
             $genre = $genres->firstWhere('id', $genreId);
