@@ -10,8 +10,8 @@ import MovieFilters from '../components/MovieFilters.vue'
 import MovieList from '../components/MovieList.vue'
 import MovieDetailsModal from '../components/MovieDetailsModal.vue'
 import { useFilterOptions } from '../composables/useFilterOptions.js'
+import {useToast} from "vue-toastification";
 
-// 1. Estado de filtros
 const filters = ref({
   query: '',
   type: 'movie',
@@ -23,28 +23,17 @@ const filters = ref({
   vote_average_gte: ''
 })
 
-// 2. Estado de filmes
 const movies  = ref([])
 const loading = ref(false)
 const error   = ref('')
 
-// 3. Usando o composable para buscar “genres”
 const { options, init } = useFilterOptions()
 const genres = computed(() => options.value.genres || [])
 
 const showModal = ref(false)
 const selectedMovieId = ref(null)
+const toast = useToast()
 
-function openDetails(id) {
-  selectedMovieId.value = id
-  showModal.value = true
-}
-function closeModal() {
-  showModal.value = false
-  selectedMovieId.value = null
-}
-
-// 4. Função de busca
 async function fetchMovies() {
   loading.value = true
   error.value   = ''
@@ -61,7 +50,34 @@ async function fetchMovies() {
   }
 }
 
-// 5. No mount, inicializa “genres” e busca filmes
+async function handleSaveFavorite(movie) {
+  try {
+    await axiosClient.post('/movies/favorites', {
+      movie_id      : movie.id,
+      title         : movie.title,
+      poster_path   : movie.poster_path,
+      overview      : movie.overview,
+      release_date  : movie.release_date,
+      vote_average  : movie.vote_average,
+      genre_ids     : movie.genre_ids || []
+    })
+    toast.success('Filme salvo nos favoritos!')
+  }
+  catch (e) {
+    const msg = e.response?.data?.message || 'Erro ao salvar favorito'
+    toast.error(msg)
+  }
+}
+
+function openDetails(id) {
+  selectedMovieId.value = id
+  showModal.value = true
+}
+function closeModal() {
+  showModal.value = false
+  selectedMovieId.value = null
+}
+
 onMounted(async () => {
   await init(['genres'])
   fetchMovies()
@@ -72,14 +88,12 @@ onMounted(async () => {
   <section class="px-6 py-8 bg-gray-100 min-h-screen">
     <h2 class="text-2xl font-bold mb-4 text-gray-800">Meus filmes</h2>
 
-    <!-- filtro -->
     <MovieFilters
         v-model="filters"
         :genres="genres"
         @search="fetchMovies"
     />
 
-    <!-- 1) Skeleton enquanto carrega -->
     <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
       <div
           v-for="n in 10"
@@ -92,19 +106,17 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 2) Mensagem de erro -->
     <div v-else-if="error" class="text-red-600 text-center py-10">
       {{ error }}
     </div>
 
-    <!-- 3) Grid de filmes quando houver dados -->
     <MovieList
         v-else
         :movies="movies"
+        @save-favorite="handleSaveFavorite"
         @show-details="openDetails"
     />
 
-    <!-- Modal de detalhes -->
     <MovieDetailsModal
         v-if="showModal"
         :movieId="selectedMovieId"

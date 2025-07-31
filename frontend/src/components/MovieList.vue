@@ -21,12 +21,12 @@ export default {
   },
   data() {
     return {
-      // Move os breakpoints para o data ou computed
       breakpoints: {
         320:  { slidesPerView: 2, spaceBetween: 8 },
         640:  { slidesPerView: 3, spaceBetween: 12 },
         1024: { slidesPerView: 5, spaceBetween: 16 }
-      }
+      },
+      openMenuFor: null
     }
   },
   methods: {
@@ -48,7 +48,6 @@ export default {
 }
 </script>
 
-
 <template>
   <Swiper
       :modules="[Navigation]"
@@ -56,43 +55,56 @@ export default {
       :breakpoints="breakpoints"
       class="my-6"
   >
-    <SwiperSlide
-        v-for="movie in movies"
-        :key="movie.id"
-        class="bg-gray-800 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition"
-    >
-      <div class="relative">
+    <SwiperSlide v-for="movie in movies" :key="movie.id">
+      <div class="relative group rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition">
+        <!-- Pôster + Badge -->
         <img
             :src="movie.poster_path"
             :alt="movie.title"
             loading="lazy"
-            class="w-full h-auto block"
+            class="w-full h-auto"
         />
-
         <div
-            class="absolute bottom-2 right-2 w-10 h-10 rounded-full border-2 flex items-center justify-center text-sm font-bold bg-black bg-opacity-70 text-white"
+            class="absolute bottom-40 right-42 w-10 h-10 rounded-full border-2 flex items-center  text-sm font-bold bg-black bg-opacity-70 text-white"
             :class="ratingClass(movie.vote_average)"
         >
           {{ toPercent(movie.vote_average) }}%
         </div>
-      </div>
 
-      <div class="p-3 bg-white space-y-2">
-        <h3 class="text-gray-900 font-semibold text-sm truncate">
-          {{ movie.title }}
-        </h3>
-        <p class="text-gray-600 text-xs">{{ formatDate(movie.release_date) }}</p>
-        <p class="text-gray-700 text-xs line-clamp-3" v-if="movie.overview">
-          {{ movie.overview }}
-        </p>
+        <!-- Conteúdo -->
+        <div class="p-3 bg-white">
+          <div class="flex items-start justify-between mb-1">
+            <h3 class="text-gray-900 font-semibold text-sm truncate max-w-[75%]">
+              {{ movie.title }}
+            </h3>
+            <button
+                @click="() => $emit('save-favorite', movie)"
+                class="px-2 py-1 text-xs rounded-full bg-indigo-100 text-indigo-600 hover:bg-indigo-200 transition"
+                title="Salvar nos favoritos"
+            >
+              ★
+            </button>
+          </div>
 
-        <!-- Botão de detalhes -->
-        <button
-            @click="$emit('show-details', movie.id)"
-            class="w-full text-center mt-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-500"
-        >
-          Detalhes
-        </button>
+          <p class="text-gray-600 text-xs mb-2">
+            {{ formatDate(movie.release_date) }}
+          </p>
+
+          <p
+              v-if="movie.overview"
+              class="text-gray-700 text-xs line-clamp-3"
+              :title="movie.overview"
+          >
+            {{ movie.overview }}
+          </p>
+
+          <button
+              @click="$emit('show-details', movie.id)"
+              class="w-full text-center mt-2 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-500"
+          >
+            Detalhes
+          </button>
+        </div>
       </div>
     </SwiperSlide>
   </Swiper>
