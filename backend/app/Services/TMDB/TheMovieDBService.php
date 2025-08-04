@@ -47,24 +47,24 @@ class TheMovieDBService implements TheMovieDBInterface
         return $this->makeRequest($endpoint, $params);
     }
 
+    /**
+     * @throws Exception
+     */
     public function getGenres(): array
     {
-        return Cache::remember('tmdb.genres', 60 * 24, fn() =>
-            $this->makeRequest('genre/movie/list')['genres']
-        );
+        return $this->makeRequest('genre/movie/list')['genres'];
     }
 
+    /**
+     * @throws Exception
+     */
     public function getMoviesList(string $endpoint, int $page = 1): array
     {
-        $cacheKey = "tmdb.{$endpoint}.page_{$page}";
-
-        return Cache::remember($cacheKey, now()->addMinutes(30), fn() =>
-            $this->makeRequest($endpoint, [
-                'api_key'  => $this->apiKey,
-                'language' => 'pt-BR',
-                'page'     => $page,
-            ])
-        );
+        return $this->makeRequest($endpoint, [
+            'api_key' => $this->apiKey,
+            'language' => 'pt-BR',
+            'page' => 1
+        ]);
     }
 
     /**
