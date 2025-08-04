@@ -49,7 +49,7 @@ DB_PASSWORD=root
 
 ### 3. Subir os containers
 
-1. Entre na pasta backend e rode o comando:
+1. Na pasta raiz rode o comando:
 ```bash
 docker compose up --build -d
 ```
@@ -58,7 +58,12 @@ Esse comando irá:
 
 - Construir as imagens (caso necessário)
 - Subir o container da aplicação Laravel
+   1. Roda o composer install
+   2. Roda as migrations
+   3. Roda as seeders (comentado)
+   4. Roda os testes automatizados
 - Subir o container do banco de dados MySQL
+- Subir o cointainer do VueJS
 
 ---
 
