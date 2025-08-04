@@ -100,6 +100,7 @@ A aplicação estará disponível em:
 http://localhost:8000
 ```
 
+
 Você pode testar os endpoints com ferramentas como Postman ou Insomnia.
 
 ---
@@ -125,6 +126,7 @@ php artisan test
 ## ✅ Próximos passos
 
 - Documentação dos endpoints da API: https://www.notion.so/KingHost-1fa8029ce0cc80e5a788fb1aae54e7d6?pvs=4
+- Para ter acesso ao TMDB, necessário configurar a variavel de ambiente "TMDB_API_KEY" no .env
 
 ---
 
